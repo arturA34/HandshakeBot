@@ -1,0 +1,4 @@
+aiogram==3.21.0
+aiohttp==3.9.5
+environs==14.2.0
+SQLAlchemy==2.0.23

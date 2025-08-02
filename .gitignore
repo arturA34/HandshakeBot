@@ -1,0 +1,5 @@
+.env
+handshake.db
+handshakevenv/
+.idea/
+__pycache__/
