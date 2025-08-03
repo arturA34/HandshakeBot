@@ -11,3 +11,7 @@ class UserName(CallbackData, prefix='username'):
 
 class RegionCallback(CallbackData, prefix='region'):
     region: str
+
+
+class CategoriesCallback(CallbackData, prefix='categories'):
+    categories: int

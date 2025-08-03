@@ -1,8 +1,8 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from src.lexicon import lexicon_ru
-from src.callbacks.callback_data import UserRole, UserName, RegionCallback
-from src.lexicon.lexicon_ru import REGIONS
+from src.callbacks.callback_data import UserRole, UserName, RegionCallback, CategoriesCallback
+from src.lexicon.lexicon_ru import REGIONS, CATEGORIES
 
 
 def get_role_keyboard(show_how_it_works: bool = True) -> InlineKeyboardMarkup:
@@ -41,4 +41,17 @@ def get_location_keyboard():
     for region in REGIONS:
         builder.row(InlineKeyboardButton(text=region,
                                          callback_data=RegionCallback(region=region).pack()))
+    return builder.as_markup()
+
+
+def get_or_update_categories_keyboard(selected: set):
+    builder = InlineKeyboardBuilder()
+    for data_id, category in CATEGORIES.items():
+        if data_id in selected:
+            builder.row(InlineKeyboardButton(text=f'✅ {category}',
+                                             callback_data=CategoriesCallback(categories=data_id).pack()))
+        else:
+            builder.row(InlineKeyboardButton(text=f'☑️ {category}',
+                                             callback_data=CategoriesCallback(categories=data_id).pack()))
+    builder.row(InlineKeyboardButton(text='👌 Подтвердить', callback_data='ok'))
     return builder.as_markup()
