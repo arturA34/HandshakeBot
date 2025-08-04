@@ -15,3 +15,7 @@ class RegionCallback(CallbackData, prefix='region'):
 
 class CategoriesCallback(CallbackData, prefix='categories'):
     categories: int
+
+
+class AcceptingCallback(CallbackData, prefix='action'):
+    action: str

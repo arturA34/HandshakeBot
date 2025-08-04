@@ -5,10 +5,11 @@ from aiogram.types import Message
 from aiogram.types import ChatMemberUpdated, Chat, CallbackQuery
 from aiogram.filters import ChatMemberUpdatedFilter, Command, StateFilter
 
-from src.callbacks.callback_data import UserName, UserRole, RegionCallback, CategoriesCallback
+from src.callbacks.callback_data import UserName, UserRole, RegionCallback, CategoriesCallback, AcceptingCallback
 from src.lexicon import lexicon_ru
 from src.keyboards import keyboards_ru
 from src.states import registration_states
+from src.utils import executor_utils
 
 router = Router()
 
@@ -36,12 +37,7 @@ async def process_user_region(callback: CallbackQuery, state: FSMContext):
 
 @router.callback_query(CategoriesCallback.filter())
 async def process_user_category(callback: CallbackQuery, state: FSMContext, callback_data: CategoriesCallback):
-    data = await state.get_data()
-    selected_categories: set = data.get('selected_categories', set())
-    if callback_data.categories not in selected_categories:
-        selected_categories.add(callback_data.categories)
-    else:
-        selected_categories.remove(callback_data.categories)
+    selected_categories = await executor_utils.update_category(state=state, callback_data=callback_data)
     await callback.message.edit_text(
         text=lexicon_ru.PROFILE_CATEGORIES_PROMPT,
         reply_markup=keyboards_ru.get_or_update_categories_keyboard(selected=selected_categories)
@@ -49,13 +45,12 @@ async def process_user_category(callback: CallbackQuery, state: FSMContext, call
     await state.update_data(selected_categories=selected_categories)
 
 
-@router.callback_query(F.data == 'ok')
+@router.callback_query(AcceptingCallback.filter())
 async def process_profile_created(callback: CallbackQuery, state: FSMContext):
     data = await state.get_data()
     categ = data.get('selected_categories')
     if categ:
         await callback.message.edit_text(text=lexicon_ru.PROFILE_CREATED_SUCCESS)
-        # ТЕСТ для меню
-        await callback.message.answer(text='Твое меню')
+        await callback.message.answer(text=lexicon_ru.EXECUTOR_MENU_TEXT)
     else:
         await callback.answer(text="Выберете хотя бы одну категорию, чтобы продолжить.")
