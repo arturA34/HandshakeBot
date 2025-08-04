@@ -21,8 +21,7 @@ router = Router()
 
 
 @router.message(Command(commands='start'))
-async def process_start_command(message: Message, session: AsyncSession):
-    await functions.add_new_user(user_id=message.from_user.id, db=session)
+async def process_start_command(message: Message):
     await message.answer(text=lexicon_ru.START_MESSAGE,
                          reply_markup=keyboards_ru.get_role_keyboard(show_how_it_works=True))
 
