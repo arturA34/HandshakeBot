@@ -19,3 +19,7 @@ class CategoriesCallback(CallbackData, prefix='categories'):
 
 class AcceptingCallback(CallbackData, prefix='action'):
     action: str
+
+
+class ExecutorMenuCallback(CallbackData, prefix='executor_menu'):
+    action: str

@@ -13,11 +13,13 @@ from src.states import registration_states
 from src.utils import executor_utils
 from src.database import functions
 
+from src.handlers.executor.executor_handlers import show_executor_menu
+
 router = Router()
 
 
 @router.callback_query(UserRole.filter(F.role == 'executor'))
-async def process_users_role(callback: CallbackQuery, state: FSMContext):
+async def process_user_role(callback: CallbackQuery, state: FSMContext):
     await state.set_state(registration_states.ExecutorRegistration.wait_name)
     await callback.message.edit_text(text=lexicon_ru.NEW_EXECUTOR_TEXT,
                                      reply_markup=keyboards_ru.get_new_users_keyboard(name=callback.from_user.first_name))
@@ -56,6 +58,6 @@ async def process_profile_created(callback: CallbackQuery, state: FSMContext, se
     if categ:
         await functions.add_new_executor(user_id=callback.from_user.id, data=data, db=session)
         await callback.message.edit_text(text=lexicon_ru.PROFILE_CREATED_SUCCESS)
-        await callback.message.answer(text=lexicon_ru.EXECUTOR_MENU_TEXT)
+        await show_executor_menu(message=callback.message)
     else:
         await callback.answer(text="Выберете хотя бы одну категорию, чтобы продолжить.")

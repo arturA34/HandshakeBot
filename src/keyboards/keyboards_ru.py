@@ -1,7 +1,8 @@
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from src.lexicon import lexicon_ru
-from src.callbacks.callback_data import UserRole, UserName, RegionCallback, CategoriesCallback, AcceptingCallback
+from src.callbacks.callback_data import (UserRole, UserName, RegionCallback, CategoriesCallback, AcceptingCallback,
+                                         ExecutorMenuCallback)
 from src.lexicon.lexicon_ru import REGIONS, CATEGORIES
 
 
@@ -54,4 +55,11 @@ def get_or_update_categories_keyboard(selected: set):
             builder.row(InlineKeyboardButton(text=f'☑️ {category}',
                                              callback_data=CategoriesCallback(categories=data_id).pack()))
     builder.row(InlineKeyboardButton(text=lexicon_ru.ACCEPTING_BTN, callback_data=AcceptingCallback(action='ok').pack()))
+    return builder.as_markup()
+
+
+def get_executor_menu_keyboard():
+    builder = InlineKeyboardBuilder()
+    builder.row(InlineKeyboardButton(text=lexicon_ru.FIND_TASKS_BTN, callback_data=ExecutorMenuCallback(action='find').pack()), InlineKeyboardButton(text=lexicon_ru.MY_RESPONSES_BTN, callback_data=ExecutorMenuCallback(action='responses').pack()), width=1)
+
     return builder.as_markup()

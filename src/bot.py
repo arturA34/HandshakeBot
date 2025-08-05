@@ -6,7 +6,7 @@ from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 
 from src.handlers import common_handlers
-from src.handlers.executor import customer_handlers, executor_registration
+from src.handlers.executor import executor_handlers, executor_registration
 from src.middleware.middleware import DBMiddleware
 from src.database.database import async_session_maker
 from src.database.database import engine, Base
@@ -29,7 +29,7 @@ async def main():
     dp.update.middleware(db_middleware)
 
     dp.include_router(common_handlers.router)
-    dp.include_router(customer_handlers.router)
+    dp.include_router(executor_handlers.router)
     dp.include_router(executor_registration.router)
 
     await dp.start_polling(bot)
