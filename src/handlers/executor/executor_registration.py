@@ -25,15 +25,21 @@ async def process_user_role(callback: CallbackQuery, state: FSMContext):
                                      reply_markup=keyboards_ru.get_new_users_keyboard(name=callback.from_user.first_name))
 
 
+@router.message(StateFilter(registration_states.ExecutorRegistration.wait_name))
+async def process_user_name_by_message(message: Message, state: FSMContext):
+    await executor_utils.process_username_common(state=state, message=message, name=message.text)
+    await state.set_state(registration_states.ExecutorRegistration.wait_location)
+
+
 @router.callback_query(UserName.filter(), StateFilter(registration_states.ExecutorRegistration.wait_name))
 async def process_user_name(callback: CallbackQuery, state: FSMContext, callback_data: UserName):
-    await state.update_data(name=callback_data.name)
-    await callback.message.edit_text(text=lexicon_ru.PROFILE_LOCATION_PROMPT,
-                                     reply_markup=keyboards_ru.get_location_keyboard())
+    await executor_utils.process_username_common(state=state, message=callback, name=callback_data.name)
+    await state.set_state(registration_states.ExecutorRegistration.wait_location)
 
 
-@router.callback_query(RegionCallback.filter())
+@router.callback_query(RegionCallback.filter(), StateFilter(registration_states.ExecutorRegistration.wait_location))
 async def process_user_region(callback: CallbackQuery, state: FSMContext, callback_data: RegionCallback):
+    await state.set_state(registration_states.ExecutorRegistration.wait_category)
     await state.update_data(location=callback_data.region)
     selected_categories = set()
     await state.update_data(selected_categories=selected_categories)
@@ -41,7 +47,7 @@ async def process_user_region(callback: CallbackQuery, state: FSMContext, callba
                                      reply_markup=keyboards_ru.get_or_update_categories_keyboard(selected_categories))
 
 
-@router.callback_query(CategoriesCallback.filter())
+@router.callback_query(CategoriesCallback.filter(), StateFilter(registration_states.ExecutorRegistration.wait_category))
 async def process_user_category(callback: CallbackQuery, state: FSMContext, callback_data: CategoriesCallback):
     selected_categories = await executor_utils.update_category(state=state, callback_data=callback_data)
     await callback.message.edit_text(
@@ -51,7 +57,7 @@ async def process_user_category(callback: CallbackQuery, state: FSMContext, call
     await state.update_data(selected_categories=selected_categories)
 
 
-@router.callback_query(AcceptingCallback.filter())
+@router.callback_query(AcceptingCallback.filter(), StateFilter(registration_states.ExecutorRegistration.wait_category))
 async def process_profile_created(callback: CallbackQuery, state: FSMContext, session: AsyncSession):
     data = await state.get_data()
     categ: set = data.get('selected_categories')
@@ -59,5 +65,6 @@ async def process_profile_created(callback: CallbackQuery, state: FSMContext, se
         await functions.add_new_executor(user_id=callback.from_user.id, data=data, db=session)
         await callback.message.edit_text(text=lexicon_ru.PROFILE_CREATED_SUCCESS)
         await show_executor_menu(message=callback.message)
+        await state.clear()
     else:
         await callback.answer(text="Выберете хотя бы одну категорию, чтобы продолжить.")
