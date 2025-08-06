@@ -7,7 +7,7 @@ from aiogram.enums import ParseMode
 
 from src.handlers import common_handlers
 from src.handlers.executor import executor_handlers, executor_registration
-from src.middleware.middleware import DBMiddleware
+from src.middleware.middleware import DBMiddleware, ThrottlingMiddleware
 from src.database.database import async_session_maker
 from src.database.database import engine, Base
 from src.database import models
@@ -25,8 +25,10 @@ async def main():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
+    throttling_middleware = ThrottlingMiddleware()
     db_middleware = DBMiddleware(session_maker=async_session_maker)
     dp.update.middleware(db_middleware)
+    dp.update.middleware(throttling_middleware)
 
     dp.include_router(common_handlers.router)
     dp.include_router(executor_handlers.router)
