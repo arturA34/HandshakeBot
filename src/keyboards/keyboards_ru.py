@@ -60,6 +60,8 @@ def get_or_update_categories_keyboard(selected: set):
 
 def get_executor_menu_keyboard():
     builder = InlineKeyboardBuilder()
-    builder.row(InlineKeyboardButton(text=lexicon_ru.FIND_TASKS_BTN, callback_data=ExecutorMenuCallback(action='find').pack()), InlineKeyboardButton(text=lexicon_ru.MY_RESPONSES_BTN, callback_data=ExecutorMenuCallback(action='responses').pack()), width=1)
+    builder.row(InlineKeyboardButton(text=lexicon_ru.FIND_TASKS_BTN, callback_data=ExecutorMenuCallback(action='find').pack()),
+                InlineKeyboardButton(text=lexicon_ru.MY_RESPONSES_BTN, callback_data=ExecutorMenuCallback(action='responses').pack()),
+                width=1)
 
     return builder.as_markup()
