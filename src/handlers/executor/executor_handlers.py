@@ -26,12 +26,12 @@ async def show_executor_menu(message: Message):
 
 
 @router.callback_query(callback_data.ExecutorMenuCallback.filter(F.action == 'find'))
-async def process_executor_menu_callback(callback: CallbackQuery):
+async def process_find_tasks(callback: CallbackQuery):
     await callback.message.edit_text(text=lexicon_ru.SEARCHING_FOR_TASKS)
 
 
 @router.callback_query(callback_data.ExecutorMenuCallback.filter(F.action == 'responses'))
-async def process_executor_menu_callback(callback: CallbackQuery):
+async def process_show_responses(callback: CallbackQuery):
     # Логика получения откликов пользователя
     await callback.message.edit_text(text=lexicon_ru.USER_RESPONSES)
 

@@ -59,12 +59,11 @@ async def process_user_category(callback: CallbackQuery, state: FSMContext, call
 
 @router.callback_query(AcceptingCallback.filter(), StateFilter(registration_states.ExecutorRegistration.wait_category))
 async def process_profile_created(callback: CallbackQuery, state: FSMContext, session: AsyncSession):
-    data = await state.get_data()
-    categ: set = data.get('selected_categories')
-    if categ:
+    categories, data = await executor_utils.get_selected_categories(state=state)
+    if categories:
         await functions.add_new_executor(user_id=callback.from_user.id, data=data, db=session)
         await callback.message.edit_text(text=lexicon_ru.PROFILE_CREATED_SUCCESS)
         await show_executor_menu(message=callback.message)
         await state.clear()
     else:
-        await callback.answer(text="Выберете хотя бы одну категорию, чтобы продолжить.")
+        await callback.answer(text=lexicon_ru.SELECT_AT_LEAST_ONE_CATEGORY)

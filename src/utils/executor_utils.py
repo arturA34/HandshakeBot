@@ -24,3 +24,9 @@ async def process_username_common(state: FSMContext, name: str, message: Message
     elif isinstance(message, CallbackQuery):
         await message.message.edit_text(text=lexicon_ru.PROFILE_LOCATION_PROMPT,
                                         reply_markup=keyboards_ru.get_location_keyboard())
+
+
+async def get_selected_categories(state: FSMContext):
+    data = await state.get_data()
+    categories: set = data.get('selected_categories')
+    return categories, data
